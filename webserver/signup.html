@@ -1,0 +1,48 @@
+
+<html>
+    <head>
+        
+    </head>
+    <body>
+        <form action="" method="post" onsubmit="signup();return false">
+            <input type="text" placeholder="Username" id="uname">
+            <input type="password" placeholder="Password" id="upass">
+            <select id="urole">
+                <option value="vendor">Vendor</option>
+                <option value="Customer">Customer</option>
+            </select>
+            <button>Signup</button>
+        </form>
+        <script>
+        async function signup() {
+            const unameObj = document.getElementById("uname");
+            const upassObj = document.getElementById("upass");
+            const uroleObj = document.getElementById("urole");
+
+            const payload = {
+                username: unameObj.value,
+                password: upassObj.value,
+                role: uroleObj.value
+            };
+            
+
+            const apiurl = "http://localhost:3000/";
+
+            console.log("payload", payload);
+
+            const response = await fetch(`${apiurl}auth/signup`, {
+                method: 'POST',
+                body: JSON.stringify(payload),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            const responseData = await response.json();
+
+            alert(responseData.message);
+        }
+        </script>
+    </body>
+</html>
+

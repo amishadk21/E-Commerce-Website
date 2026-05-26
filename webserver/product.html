@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+</head>
+<body>
+
+    <div id="header"></div>
+    <div class="d-flex justify-content-center align-items-center vh-100">
+        <form class="w-50 bg-warning p-4 shadow"  onsubmit="addProduct(); return false">
+            <h3 class="text-center">Add Product here..</h3>
+
+            <input class="form-control mt-3" required type="text" id="name" placeholder="Product Name" autocomplete="on">
+            <input class="form-control mt-2" required type="number" id="price" placeholder="Product Price" autocomplete="on">
+            <textarea class="form-control mt-2" required id="detail" placeholder="Product Description" autocomplete="on"></textarea>
+
+            <input class="form-control mt-2" type="file" id="productImage">
+            <div class="text-center mt-3">
+                <button class="btn btn-danger" type="submit">Add Product</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+
+        async function load(){
+            const response=await fetch("vendormenu.html");
+            const responseData=await response.text()
+
+            headerObj=document.getElementById("header")
+            headerObj.innerHTML=responseData
+        }
+        load();
+        
+        async function addProduct() {
+             nameObj = document.getElementById("name");
+             priceObj = document.getElementById("price");
+             detailObj = document.getElementById("detail");
+
+            const payload = {name: nameObj.value, price: priceObj.value,detail: detailObj.value};
+
+            const apiurl = "http://localhost:3000/";
+
+            try {
+                const response = await fetch(`${apiurl}product/add`, {
+                    method: "POST",
+                    headers: {
+                        'Content-Type': "application/json",
+                        "authorization": sessionStorage.getItem("token")
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const responseData = await response.json();
+                alert(responseData.message);
+            } catch (error) {
+                alert("Something Went Wrong: " + error.message);
+            }
+        }
+        load();
+
+    </script>
+</body>
+</html>

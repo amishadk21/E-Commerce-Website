@@ -1,0 +1,113 @@
+<html>
+<head>
+    <style>
+        #parent {
+            display: flex;
+            gap: 10px;
+        }
+        .pdt-card {
+            background-color: maroon;
+            color: white;
+            padding: 10px;
+        }
+        .name {
+            font-size: 22px;
+            color: gold;
+        }
+        .price {
+            font-size: 22px;
+        }
+        .price::after {
+            content: " Rs";
+            font-size: 12px;
+        }
+        .order{
+            display:flex;
+            align-items:center;
+
+        }
+    </style>
+</head>
+<body>
+    <div id="header"></div>
+    <div id="order"></div>
+    <div id="parent"></div>
+
+    <script>
+        const apiurl = "http://localhost:3000/";
+
+        async function load() {
+            const response = await fetch("customer_menu.html");
+            const responseData = await response.text();
+            const headerObj = document.getElementById("header");
+            headerObj.innerHTML = responseData;
+        }
+        load();
+
+        const parentObj = document.getElementById("parent");
+
+        orderObj=document.getElementById("order")
+        async function getCart() {
+            const response = await fetch(`${apiurl}cart/view`, {
+                method: "GET",
+                headers: {
+                    'Content-Type': "application/json",
+                    authorization: sessionStorage.getItem("token")
+                }
+            });
+
+            const responseData = await response.json();
+
+            if (responseData.error == false) {
+                console.log(responseData.data);
+
+                const product = responseData.data;
+                parentObj.innerHTML = ""; // Clear previous content
+                total=0
+                for (let i = 0; i < product.length; i++) {
+                    total+=product[i].price;
+                    parentObj.innerHTML += `<div class='pdt-card'>
+                        <div class='name'>${product[i].name}</div>
+                        <div class='price'>${product[i].price}</div>
+                        <div class='detail'>${product[i].detail}</div>
+                        <div class='text-center mt-1'>
+                            <button onclick='removecart(${product[i].cartid})' class='btn btn-info'>Remove from Cart</button>
+                        </div>
+                    </div>`
+
+
+                }
+                orderObj.innerHTML=`<div class='order'>
+                    <h1 class='display-4'>Total:${total}</h1>
+                    <button  class='ms-4 btn btn-success' onclick='place_order()'>Place Order</button>
+                </div>`
+                    } else {
+                alert(responseData.message);
+            }
+        }
+        function place_order(){
+            alert("Pending")
+        }
+
+      
+
+        async function removecart(cartid) {
+            const payload = {cartid:cartid};
+            const response = await fetch(`${apiurl}cart/remove`, {
+                method: "POST",
+                headers: {
+                    'Content-Type': "application/json",
+                    "authorization": sessionStorage.getItem("token")
+                },
+                body:JSON.stringify(payload)
+            });
+
+            const responseData = await response.json();
+            alert(responseData.message);
+            getCart(); // Fixed typo from getcart()
+        }
+
+        getCart();
+    </script>
+</body>
+</html>

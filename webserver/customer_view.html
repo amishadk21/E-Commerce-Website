@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        #parent{
+            display:flex;
+            gap:10px;
+        }
+        .pdt-card{
+            background-color: maroon;
+            color:white;
+            padding:10px;
+
+        }
+        .name{
+            font-size: 22px;
+            color:gold;
+         }
+        
+        .price{
+            font-size: 22px;
+
+        }
+        .price::after{
+            content:" Rs";
+            font-size:12px;
+
+        }
+    </style>
+
+</head>
+<body>
+     <div id="header"></div>
+
+    <div id="parent"></div>
+    <script>
+        const apiurl="http://localhost:3000/";
+
+
+         async function load(){
+            const response=await fetch("customer_menu.html");
+            const responseData=await response.text()
+
+            headerObj=document.getElementById("header")
+            headerObj.innerHTML=responseData
+        }
+        load();
+
+
+
+        parentObj=document.getElementById("parent")
+
+         async function getProduct(){
+
+        const response=await fetch(`${apiurl}product/view`,{
+            method:"GET",
+            headers:{
+                'Content-Type':"application/json",
+                authorization:sessionStorage.getItem("token")
+            
+    }
+
+        })
+
+        const responseData=await response.json()
+
+        
+
+        if(responseData.error==false)
+    {
+        console.log(responseData.data)
+        product=responseData.data;
+        for(i=0;i<product.length;i++){
+            parentObj.innerHTML+=`<div class='pdt-card'>
+                <div class='name'>${product[i].name}</div>
+                <div class='price'>${product[i].price}</div>
+                <div class='detail'>${product[i].detail}</div>
+
+                <div class='text-center mt-1'>
+                    <button onclick='addcart(${product[i].pid})' class='btn btn-info'>Add to Cart</button>
+                    </div>
+
+
+                </div>`
+        }
+    }
+    else{
+        alert(responseData.message)
+
+    }
+}
+
+async function addcart(pid){
+    const payload={pid:pid}
+    const response=await fetch(`${apiurl}cart/add`,{
+        method:"POST",
+        headers:{
+            'Content-Type':"application/json",
+            authorization:sessionStorage.getItem("token")
+        },
+
+        body:JSON.stringify(payload)
+
+
+    })
+    const responseData=await response.json()
+    alert(responseData.message)
+    getProduct()
+}
+getProduct();
+    
+    </script>
+</body>
+</html>
